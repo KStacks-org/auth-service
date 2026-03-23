@@ -1,5 +1,6 @@
 package com.kaustack.auth.controller;
 
+import com.kaustack.auth.exception.UnauthorizedException;
 import com.kaustack.auth.model.User;
 import com.kaustack.auth.service.AuthService;
 import com.kaustack.jwt.JwtUtils;
@@ -30,6 +31,38 @@ public class AuthController {
     @GetMapping("/login")
     public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.sendRedirect(request.getContextPath() + "/oauth2/authorization/google");
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response) {
+
+        if (refreshToken == null) {
+            throw new UnauthorizedException("You are not logged in");
+        }
+
+        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from("access_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(0);
+        ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(0);
+
+        if (cookieDomain != null && !cookieDomain.isBlank()) {
+            accessCookieBuilder.domain(cookieDomain);
+            refreshCookieBuilder.domain(cookieDomain);
+        }
+
+        response.addHeader("Set-Cookie", accessCookieBuilder.build().toString());
+        response.addHeader("Set-Cookie", refreshCookieBuilder.build().toString());
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/refresh")
