@@ -14,12 +14,12 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       
       # Database configuration (configure to connect to your external database)
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:postgresql://localhost:5432/auth_db}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-auth_user}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-auth_password}
-      SPRING_DATASOURCE_DRIVER_CLASS_NAME: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:-org.postgresql.Driver}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-update}
-      SPRING_JPA_DATABASE_PLATFORM: ${SPRING_JPA_DATABASE_PLATFORM:-org.hibernate.dialect.PostgreSQLDialect}
+      DB_HOST: ${DB_HOST:-localhost}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_NAME: ${DB_NAME:-auth_db}
+      DB_USER: ${DB_USER:-auth_user}
+      DB_PASS: ${DB_PASS:-auth_password}
+      DB_DDL_AUTO: ${DB_DDL_AUTO:-update}
       
       # JWT configuration
       JWT_ACCESS_TOKEN_PRIVATE_KEY: ${JWT_ACCESS_TOKEN_PRIVATE_KEY}
