@@ -1,6 +1,5 @@
 package com.kaustack.auth.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kaustack.auth.dto.response.ErrorResponse;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +17,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import lombok.RequiredArgsConstructor;
+
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.HashMap;
 import java.util.Map;
