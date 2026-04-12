@@ -36,7 +36,7 @@ public class GenderizeService {
             if (response == null || response.getGender() == null) {
                 return Gender.UNKNOWN;
             }
-            return response.getGender();
+            return Gender.valueOf(response.getGender().toUpperCase());
         } catch (Exception e) {
             log.warn("Gender prediction failed for name '{}': {}", firstName, e.getMessage());
             return Gender.UNKNOWN;
