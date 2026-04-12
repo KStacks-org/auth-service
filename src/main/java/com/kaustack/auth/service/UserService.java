@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final GenderizeService genderizeService;
 
     @Transactional
     public User processOAuth2User(OAuth2User oAuth2User) {
@@ -20,15 +21,12 @@ public class UserService {
         String name = oAuth2User.getAttribute("name");
 
         return userRepository.findByEmail(email)
-                .map(existingUser -> {
-                    // Update user if needed
-                    return existingUser;
-                })
                 .orElseGet(() -> {
+                    Gender gender = genderizeService.predictGender(name);
                     User newUser = User.builder()
                             .email(email)
                             .name(name)
-                            .gender(Gender.UNKNOWN) // Default
+                            .gender(gender)
                             .build();
                     return userRepository.save(newUser);
                 });
