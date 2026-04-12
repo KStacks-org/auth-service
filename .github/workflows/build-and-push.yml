@@ -118,7 +118,7 @@ jobs:
           NEW_IMAGE="ghcr.io/kstacks-org/auth-service:master-${SHORT_SHA}"
           FILE="infra/auth-service/deployment.yaml"
 
-          yq -i '.spec.template.spec.containers[0].image = strenv(NEW_IMAGE)' "$FILE"
+          yq -i ".spec.template.spec.containers[0].image = \"${NEW_IMAGE}\"" "$FILE"
 
           echo "Updated image to: ${NEW_IMAGE}"
           yq '.spec.template.spec.containers[0].image' "$FILE"
