@@ -86,7 +86,7 @@ jobs:
       - name: Update auth-service image tag
         run: |
           SHORT_SHA="${GITHUB_SHA::7}"
-          NEW_IMAGE="ghcr.io/kstacks-org/auth-service:master-${SHORT_SHA}"
+          NEW_IMAGE="ghcr.io/kstacks-org/auth-service:prod-${SHORT_SHA}"
           FILE="infra/auth-service/deployment.yaml"
 
           yq -i ".spec.template.spec.containers[0].image = \"${NEW_IMAGE}\"" "$FILE"
@@ -102,5 +102,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add auth-service/deployment.yaml
           git diff --cached --quiet && echo "No changes to commit" && exit 0
-          git commit -m "chore(auth): bump image to master-${SHORT_SHA}"
+          git commit -m "chore(auth): bump image to prod-${SHORT_SHA}"
           git push
