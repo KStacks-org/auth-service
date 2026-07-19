@@ -1,10 +1,6 @@
-# Dockerfile for local development
-# This includes a full Maven build with GitHub authentication
-# For CI/CD, use Dockerfile.ci which uses pre-built JAR
-# Multi-stage build for optimized image size
-
+# Multi-stage build for optimized native image
 # Stage 1: Build
-FROM eclipse-temurin:25-jdk-alpine AS builder
+FROM ghcr.io/graalvm/native-image-community:25-muslib AS builder
 
 WORKDIR /app
 
@@ -38,11 +34,11 @@ RUN ./mvnw dependency:go-offline
 # Copy source code
 COPY src ./src
 
-# Build the application
-RUN ./mvnw clean package -DskipTests
+# Build the application as a native image
+RUN ./mvnw clean native:compile -Pnative -DskipTests
 
 # Stage 2: Runtime
-FROM eclipse-temurin:25-jre-alpine
+FROM alpine:latest
 
 WORKDIR /app
 
@@ -50,8 +46,11 @@ WORKDIR /app
 RUN addgroup -g 1001 -S appgroup && \
     adduser -u 1001 -S appuser -G appgroup
 
-# Copy the JAR from builder stage
-COPY --from=builder /app/target/*.jar app.jar
+# Install dependencies needed by Spring Boot native image
+RUN apk add --no-cache tzdata ca-certificates bash wget
+
+# Copy the native executable from builder stage
+COPY --from=builder /app/target/auth app
 
 # Change ownership to non-root user
 RUN chown -R appuser:appgroup /app
@@ -69,4 +68,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
 # Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["./app"]
