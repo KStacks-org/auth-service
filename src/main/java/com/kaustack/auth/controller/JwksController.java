@@ -17,7 +17,7 @@ public class JwksController {
 
     private final JwtUtils jwtUtils;
     @GetMapping("/.well-known/jwks.json")
-    public ResponseEntity<Map<String, List<Map<String, String>>>> jwks() {
+    public ResponseEntity<Map<String, List<Map<String, Object>>>> jwks() {
         return ResponseEntity.ok(Map.of("keys", List.of(jwtUtils.getAccessPublicKeyAsJwk())));
     }
 }
