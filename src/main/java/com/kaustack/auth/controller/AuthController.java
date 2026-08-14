@@ -52,7 +52,7 @@ public class AuthController {
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Strict")
-                .path("/auth/refresh")
+                .path("/")
                 .maxAge(0);
 
         if (cookieDomain != null && !cookieDomain.isBlank()) {

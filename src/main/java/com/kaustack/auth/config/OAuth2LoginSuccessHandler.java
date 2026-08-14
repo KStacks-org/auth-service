@@ -59,7 +59,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Strict")
-                .path("/auth/refresh")
+                .path("/")
                 .maxAge(jwtUtils.extractMaxAge(refreshToken));
         if (cookieDomain != null && !cookieDomain.isBlank()) {
             refreshCookieBuilder.domain(cookieDomain);
