@@ -8,6 +8,7 @@ import com.kaustack.auth.model.User;
 import com.kaustack.auth.repository.FlagRepository;
 import com.kaustack.auth.repository.UserRepository;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,7 +37,11 @@ public class FlagService {
                 .name(request.name())
                 .description(request.description())
                 .build();
-        return flagRepository.save(flag);
+        try {
+            return flagRepository.saveAndFlush(flag);
+        } catch (DataIntegrityViolationException ex) {
+            throw new ConflictException("Flag '" + request.name() + "' already exists");
+        }
     }
 
     @Transactional
