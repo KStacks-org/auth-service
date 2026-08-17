@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Email;
 
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -31,4 +33,13 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private Gender gender = Gender.UNKNOWN;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_flags",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "flag_id")
+    )
+    @Builder.Default
+    private Set<Flag> flags = new HashSet<>();
 }
