@@ -33,10 +33,12 @@ public class FlagService {
         if (flagRepository.existsByName(request.name())) {
             throw new ConflictException("Flag '" + request.name() + "' already exists");
         }
+
         Flag flag = Flag.builder()
                 .name(request.name())
                 .description(request.description())
                 .build();
+
         try {
             return flagRepository.saveAndFlush(flag);
         } catch (DataIntegrityViolationException ex) {
@@ -46,30 +48,38 @@ public class FlagService {
 
     @Transactional
     public void deleteFlag(UUID flagId) {
-        Flag flag = flagRepository.findById(flagId)
-                .orElseThrow(() -> new ResourceNotFoundException("Flag not found"));
+        Flag flag = getFlag(flagId);
 
-        for (User user : userRepository.findAllByFlagId(flagId)) {
+        for (User user : userRepository.findAllByFlagsId(flagId)) {
             user.getFlags().remove(flag);
         }
+
         flagRepository.delete(flag);
     }
 
     @Transactional
     public void assignFlag(UUID userId, UUID flagId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        Flag flag = flagRepository.findById(flagId)
-                .orElseThrow(() -> new ResourceNotFoundException("Flag not found"));
+        User user = getUser(userId);
+        Flag flag = getFlag(flagId);
+
         user.getFlags().add(flag);
     }
 
     @Transactional
     public void unassignFlag(UUID userId, UUID flagId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-        Flag flag = flagRepository.findById(flagId)
-                .orElseThrow(() -> new ResourceNotFoundException("Flag not found"));
+        User user = getUser(userId);
+        Flag flag = getFlag(flagId);
+
         user.getFlags().remove(flag);
+    }
+
+    private User getUser(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    }
+
+    private Flag getFlag(UUID flagId) {
+        return flagRepository.findById(flagId)
+                .orElseThrow(() -> new ResourceNotFoundException("Flag not found"));
     }
 }

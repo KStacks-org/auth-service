@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/")
 @RequiredArgsConstructor
 @PreAuthorize("hasAuthority('" + Flag.SUPER_ADMIN + "')")
 public class FlagController {
@@ -24,12 +25,14 @@ public class FlagController {
 
     @GetMapping("/flags")
     public ResponseEntity<List<Flag>> listFlags() {
-        return ResponseEntity.ok(flagService.listFlags());
+        List<Flag> flags = flagService.listFlags();
+        return ResponseEntity.ok(flags);
     }
 
     @PostMapping("/flags")
     public ResponseEntity<Flag> createFlag(@Valid @RequestBody CreateFlagRequest request) {
-        return ResponseEntity.ok(flagService.createFlag(request));
+        Flag flag = flagService.createFlag(request);
+        return ResponseEntity.ok(flag);
     }
 
     @DeleteMapping("/flags/{flagId}")

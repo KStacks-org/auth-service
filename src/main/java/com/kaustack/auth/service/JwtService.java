@@ -25,6 +25,7 @@ public class JwtService {
                 .map(Flag::getName)
                 .sorted()
                 .toList();
+
         return jwtGenerator.generateToken(
                 TokenType.ACCESS,
                 user.getId().toString(),

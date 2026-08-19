@@ -25,6 +25,6 @@ public class Flag {
     private String name;
 
     @Setter
-    @Column
+    @Column(length = 255)
     private String description;
 }
