@@ -1,8 +1,10 @@
 package com.kaustack.auth.controller;
 
+import com.kaustack.auth.dto.request.UpdateGenderRequest;
 import com.kaustack.auth.exception.UnauthorizedException;
 import com.kaustack.auth.model.User;
 import com.kaustack.auth.service.AuthService;
+import com.kaustack.auth.service.UserService;
 import com.kaustack.jwt.JwtUtils;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 
 import java.io.IOException;
 
@@ -23,6 +26,7 @@ import java.io.IOException;
 public class AuthController {
 
     private final AuthService authService;
+    private final UserService userService;
     private final JwtUtils jwtUtils;
 
     @Value("${app.cookie.domain:}")
@@ -91,5 +95,14 @@ public class AuthController {
             @CookieValue(name = "access_token", required = false) String accessToken) {
         User user = authService.getCurrentUser(accessToken);
         return ResponseEntity.ok(user);
+    }
+
+    @PatchMapping("/me")
+    public ResponseEntity<User> updateGender(
+            @CookieValue(name = "access_token", required = false) String accessToken,
+            @Valid @RequestBody UpdateGenderRequest request) {
+        User user = authService.getCurrentUser(accessToken);
+        User updated = userService.setGender(user.getId(), request.gender());
+        return ResponseEntity.ok(updated);
     }
 }
