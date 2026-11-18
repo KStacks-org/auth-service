@@ -34,6 +34,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     @Value("${app.cookie.domain:}")
     private String cookieDomain;
 
+    @Value("${app.cookie.access-token-name:access_token}")
+    private String accessTokenCookieName;
+
+    @Value("${app.cookie.refresh-token-name:refresh_token}")
+    private String refreshTokenCookieName;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
             Authentication authentication) throws IOException {
@@ -44,7 +50,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String accessToken = jwtService.generateAccessToken(user);
         String refreshToken = jwtService.generateRefreshToken(user);
 
-        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from("access_token", accessToken)
+        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from(accessTokenCookieName, accessToken)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")
@@ -55,7 +61,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         }
         ResponseCookie accessCookie = accessCookieBuilder.build();
 
-        ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie.from("refresh_token", refreshToken)
+        ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie.from(refreshTokenCookieName, refreshToken)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Strict")
