@@ -32,6 +32,12 @@ public class AuthController {
     @Value("${app.cookie.domain:}")
     private String cookieDomain;
 
+    @Value("${app.cookie.access-token-name:access_token}")
+    private String accessTokenCookieName;
+
+    @Value("${app.cookie.refresh-token-name:refresh_token}")
+    private String refreshTokenCookieName;
+
     @GetMapping("/login")
     public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.sendRedirect(request.getContextPath() + "/oauth2/authorization/google");
@@ -39,20 +45,20 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
-            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            @CookieValue(name = "${app.cookie.refresh-token-name:refresh_token}", required = false) String refreshToken,
             HttpServletResponse response) {
 
         if (refreshToken == null) {
             throw new UnauthorizedException("You are not logged in");
         }
 
-        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from("access_token", "")
+        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from(accessTokenCookieName, "")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(0);
-        ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie.from("refresh_token", "")
+        ResponseCookie.ResponseCookieBuilder refreshCookieBuilder = ResponseCookie.from(refreshTokenCookieName, "")
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Strict")
@@ -71,11 +77,11 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<Void> refreshToken(
-            @CookieValue(name = "refresh_token", required = false) String refreshToken,
+            @CookieValue(name = "${app.cookie.refresh-token-name:refresh_token}", required = false) String refreshToken,
             HttpServletResponse response) {
         String newAccessToken = authService.refreshToken(refreshToken);
 
-        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from("access_token", newAccessToken)
+        ResponseCookie.ResponseCookieBuilder accessCookieBuilder = ResponseCookie.from(accessTokenCookieName, newAccessToken)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")
@@ -92,14 +98,14 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<User> getCurrentUser(
-            @CookieValue(name = "access_token", required = false) String accessToken) {
+            @CookieValue(name = "${app.cookie.access-token-name:access_token}", required = false) String accessToken) {
         User user = authService.getCurrentUser(accessToken);
         return ResponseEntity.ok(user);
     }
 
     @PatchMapping("/me")
     public ResponseEntity<User> updateGender(
-            @CookieValue(name = "access_token", required = false) String accessToken,
+            @CookieValue(name = "${app.cookie.access-token-name:access_token}", required = false) String accessToken,
             @Valid @RequestBody UpdateGenderRequest request) {
         User user = authService.getCurrentUser(accessToken);
         User updated = userService.setGender(user.getId(), request.gender());
