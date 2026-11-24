@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers("/.well-known/jwks.json").permitAll()
                         .requestMatchers("/oauth2/**", "/login/oauth2/**").permitAll()
                         .requestMatchers("/actuator/health/**").permitAll()
+                        .requestMatchers("/actuator/prometheus").permitAll()
                         .requestMatchers("/actuator/**").hasRole("ACTUATOR")
                         .anyRequest().authenticated())
                 .oauth2Login(oauth2 -> oauth2
